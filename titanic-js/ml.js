@@ -51,7 +51,16 @@ export function trainTree(rows, {maxDepth = 4, minLeaf = 8} = {}) {
     }
     return {node,path};
   }
+  // The whole tree as indented text: one line per question, one per final prediction.
+  function describe(node = root, indent = '') {
+    if (!node.left) return `${indent}→ predict ${node.prediction} (${node.positive} of ${node.count} training passengers survived)\n`;
+    const key = features[node.feature];
+    const [yes, no] = key === 'sex' ? ['Recorded sex is male:', 'Recorded sex is female:']
+      : [`${key} ≤ ${+node.threshold.toFixed(2)}:`, `${key} > ${+node.threshold.toFixed(2)}:`];
+    return `${indent}${yes}\n${describe(node.left, indent + '    ')}${indent}${no}\n${describe(node.right, indent + '    ')}`;
+  }
   return {root, medians, features:[...features],
     predict: p => walk(p).node.prediction,
-    explain: p => walk(p).path.join(' → ')};
+    explain: p => walk(p).path.join(' → '),
+    describe: () => describe()};
 }

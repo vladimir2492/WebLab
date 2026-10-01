@@ -11,6 +11,7 @@
     "lesson": "vite",
     "lesson:preview": "notebooks preview --root .",
     "build": "vite build",
+    "preview": "vite preview",
     "build:notebook": "notebooks build --root . -- lesson.html"
   },
   "engines": { "node": ">=22.12.0" },

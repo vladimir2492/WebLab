@@ -1,39 +1,42 @@
 <!doctype html>
 <notebook theme="air">
   <title>Titanic lab: from observations to predictions</title>
-  <script id="1" type="text/markdown">
+  <script id="1" type="text/markdown" data-chapter="Meet the passengers">
     # Titanic lab: from observations to predictions
+
     Our question: **can a simple rule predict passenger survival?**
-    First look at the data. Then compare groups, make a rule, and check where the rule is wrong.
-    We use JavaScript to ask questions about the data. The main goal is to learn how to check an idea with facts.
 
-    **Your challenge:** use this notebook to explore Titanic passengers, test your own prediction rule, and explain what you discover. A **prediction** is a guess made by a rule or a model. At the end, show a partner one result and one mistake your model made.
-    Work in pairs: one person runs the cells. The other guesses what will happen and explains the result. Swap jobs halfway through.
-    **What you will learn:** read the fields, compare groups fairly, check your rule against a simple starting guess, and explain how a computer learns from examples. You do not need to memorize the JavaScript. Read the explanations, change one thing at a time, and use the results to explain your ideas.
+    You will look at real passenger records, compare groups, write a rule, and check where the rule is wrong. Then you will let the computer learn a rule from examples, and check that one too.
 
-    **How to use your notebook:** results load when you open the page. To try a change, choose **Edit code**, change a value, and press **Run** or **Shift+Enter**. Use **+ Code cell** to add your own experiment. Your edits stay in this browser; choose **Save notebook** to download your work before you finish.
+    A **prediction** is a guess made by a rule or a model. You do not need to memorize the JavaScript. Change one thing at a time and use the results to explain your ideas.
+
+    **Work in pairs.** One person runs the cells. The other guesses what will happen and explains the result. Swap jobs in each chapter.
+
+    **Three things to know about this notebook**
+
+    - **Your turn** boxes are for your answers. They are saved as you type.
+    - Some results are hidden until you type a guess. Guess first: a wrong guess teaches you more than no guess.
+    - Your work stays in this browser. Choose **Save my work** to download a report you can hand in.
 
     ## Meet the passengers
+
     Our table has 1,309 passenger rows and 14 columns. Each row is one passenger. Each column gives one detail about that passenger. Scroll to see more rows. Click a column name to sort the table.
-    **Talk before coding:** What can you learn from one row? Which details were known before the ship sank? Which values are missing?
-    This is a historical dataset for learning. It does not include the ship's crew. Some ages are estimates, and the list may differ from newer historical research.
   </script>
-  <script id="32" type="text/markdown">
-    ### Did you know? A few facts behind the table
-    - **It was Titanic's first voyage.** The ship left Southampton on 10 April 1912, heading for New York. It stopped at Cherbourg and Queenstown—the places behind our `embarked` codes.
-    - **The sinking took about 2 hours and 40 minutes after the collision.** Titanic hit the iceberg at about 11:40 p.m. on 14 April and sank at about 2:20 a.m. on 15 April.
-    - **There were 20 lifeboats.** Their total capacity was about 1,178 people, while about 2,200 passengers and crew were aboard. Our passenger table does not include the crew.
-    - **Titanic also carried mail.** The letters RMS stand for “Royal Mail Ship.”
-    - **The wreck was found in 1985.** That was 73 years after the sinking, about 2.5 miles below the ocean surface.
-
-    Historical source: [Royal Museums Greenwich](https://www.rmg.co.uk/stories/maritime-history/rms-titanic-facts).
-
-    **Think about it:** our table has ages, fares, and classes—but no column for where each person was when the iceberg was hit. What other missing details might matter? A table can tell us a lot without telling us the whole story.
+  <script id="2" type="module" pinned>
+    const passengers = await FileAttachment("assets/titanic.csv").csv({typed: true});
+    display(Inputs.table(passengers));
+  </script>
+  <script id="50" type="text/markdown" data-note>
+    **Talk before coding.** Pick one row. What can you learn about that person? Which details were known before the ship sank? Which values are missing?
   </script>
   <script id="20" type="text/markdown">
     ### What do the fields mean?
+
     A **field** is a column in the table, such as `age`. A **value** is what you find in one cell, such as `29`.
+
     A **feature** is a detail we give to the model to help it make a guess. The **target** is the answer we want it to guess: `survived`.
+
+    Use this table as a reference. You do not need to read every row now.
 
     | Field | Simple meaning | Example value and what it means | Use in our lesson |
     |---|---|---|---|
@@ -53,32 +56,34 @@
     | `home.dest` | The person's recorded home or travel destination | `St Louis, MO` = St Louis, Missouri; `Montreal, PQ / Chesterville, ON` lists two places | Read more about a passenger's journey; not an input in our small model |
 
     ### Read one real passenger row
+
     Elisabeth Walton Allen has `pclass = 1`, `age = 29`, `sibsp = 0`, `parch = 0`, and `survived = 1`.
+
     In plain English: she was 29, travelled in first class, and survived. This table lists no siblings, spouse, parents, or children travelling with her. That does **not** prove she travelled without friends or other people she knew.
 
     ### Three details that are easy to misunderstand
+
     - **Blank is not zero.** A blank age means “we do not know.” `sibsp = 0` means no siblings or spouse are recorded on the ship.
     - **A number can be a label.** Ticket `113781` identifies a ticket. Adding ticket numbers together would not tell us anything useful about passengers.
     - **Some fields already reveal the answer.** Imagine predicting a test score while looking at the answer sheet. Using `survived`, `boat`, or `body` as prediction inputs creates a similar problem.
 
-    **Try it:** explain `pclass = 3`, `age = 2`, and `parch = 2` in your own words. Can you tell whether this passenger survived from those three details alone?
-    Now run the next cell to open the complete table.
+    This is a historical dataset for learning. It does not include the ship's crew. Some ages are estimates, and the list may differ from newer historical research.
   </script>
-  <script id="2" type="module" pinned>
-    const passengers = await FileAttachment("assets/titanic.csv").csv({typed: true});
-    display(Inputs.table(passengers));
+  <script id="51" type="text/markdown" data-note>
+    **Try it.** Explain `pclass = 3`, `age = 2`, and `parch = 2` in your own words. Can you tell whether this passenger survived from those three details alone?
   </script>
   <script id="33" type="text/markdown">
     ### Three discoveries you can check yourself
-    These facts come from **our 1,309-row CSV**, using its recorded values. They describe this dataset, not every person aboard.
+
+    These facts come from **our 1,309-row table**, using its recorded values. They describe this dataset, not every person aboard.
 
     **1. A baby and an 80-year-old both survived.** The youngest recorded age is `0.17` years—about two months—for Elizabeth Gladys “Millvina” Dean. The oldest recorded age is `80`, for Algernon Henry Wilson Barkworth. Both rows have `survived = 1`. These two people show why age alone cannot decide a person's outcome.
 
-    **2. First class did not guarantee survival.** In our data, 200 of 323 first-class passengers survived—about 62%. In third class, 181 of 709 survived—about 26%. The rates differ, but both groups include survivors and people who died. Later, use the grouping chart to check these numbers.
+    **2. More than half of the passengers travelled in third class.** There are 709 third-class passengers, 277 in second class, and 323 in first class. A pattern in a big group affects the totals more than a pattern in a small one.
 
     **3. About one age in five is missing.** There are 263 blank ages out of 1,309 passengers—about 20%. A rule based on age must say what it does when the age is unknown.
 
-    **Mini challenge:** run the next cell to find the youngest and oldest recorded ages. Change `slice(0, 1)` to `slice(0, 5)` to see the five youngest. Why do we remove blank ages before sorting?
+    The next cell finds the youngest and the oldest recorded age.
   </script>
   <script id="34" type="module" pinned>
     const knownAges = passengers.filter(p => p.age != null);
@@ -88,25 +93,47 @@
     }));
     display(`Passengers with unknown age: ${passengers.filter(p => p.age == null).length}`);
   </script>
-  <script id="3" type="text/markdown">
-    `survived` is our outcome: 1 means survived, 0 means did not survive.
-    `pclass` is ticket class; `sibsp` counts siblings/spouses aboard; `parch` counts parents/children aboard.
-    **Do not use `boat` or `body` to predict:** they record events after the disaster and can reveal the answer.
-
-    ## Ask a smaller question
-    Instead of reading every row, select first-class passengers. Before revealing the outcome, guess: did every first-class passenger survive?
+  <script id="52" type="text/markdown" data-note>
+    **Mini challenge.** Choose **Edit code** above. Change `slice(0, 1)` to `slice(0, 5)` and press **Run** to see the five youngest passengers. Why do we remove blank ages before sorting?
   </script>
-  <script id="4" type="module" pinned>
+  <script id="3" type="text/markdown">
+    ## Ask a smaller question
+
+    Instead of reading every row, select only the first-class passengers. There are 323 of them.
+
+    Remember: `survived` is our outcome. `1` means survived, `0` means did not survive.
+  </script>
+  <script id="4" type="module" pinned data-guess="How many of the 323 first-class passengers do you think survived?">
     const firstClass = passengers.filter(p => p.pclass === 1);
+    const firstClassSurvivors = firstClass.filter(p => p.survived === 1).length;
+    display(`${firstClassSurvivors} of ${firstClass.length} first-class passengers survived (${Math.round(100 * firstClassSurvivors / firstClass.length)}%).`);
     display(Inputs.table(firstClass, {columns: ["name", "pclass", "age", "sex", "survived"]}));
   </script>
-  <script id="5" type="text/markdown">
+  <script id="32" type="text/markdown">
+    ### Did you know? A few facts behind the table
+
+    Read this if you finish early.
+
+    - **It was Titanic's first voyage.** The ship left Southampton on 10 April 1912, heading for New York. It stopped at Cherbourg and Queenstown—the places behind our `embarked` codes.
+    - **The sinking took about 2 hours and 40 minutes after the collision.** Titanic hit the iceberg at about 11:40 p.m. on 14 April and sank at about 2:20 a.m. on 15 April.
+    - **There were 20 lifeboats.** Their total capacity was about 1,178 people, while about 2,200 passengers and crew were aboard. Our passenger table does not include the crew.
+    - **Titanic also carried mail.** The letters RMS stand for “Royal Mail Ship.”
+    - **The wreck was found in 1985.** That was 73 years after the sinking, about 2.5 miles below the ocean surface.
+
+    Historical source: [Royal Museums Greenwich](https://www.rmg.co.uk/stories/maritime-history/rms-titanic-facts).
+
+    **Think about it:** our table has ages, fares, and classes—but no column for where each person was when the iceberg was hit. A table can tell us a lot without telling us the whole story.
+  </script>
+  <script id="5" type="text/markdown" data-chapter="Find patterns">
     ## Group fields to find patterns
-    Group passengers by one field, count the people, and count survivors.
-    **Why a rate?** A larger group can have more survivors simply because it has more people.
-    For example, 30 survivors out of 100 people is 30%; 20 out of 40 is 50%. The group with fewer survivors has the higher survival rate.
-    **Your turn:** write one sentence with a group size and a survival rate, then one question the data cannot answer.
-    Change the grouping field and compare both counts and percentages. If two things appear together in the data, that does not prove one caused the other. For example, a higher survival rate in one ticket class does not, by itself, explain why those passengers survived.
+
+    Group passengers by one field, count the people, and count the survivors.
+
+    **Why a rate?** A larger group can have more survivors simply because it has more people. For example, 30 survivors out of 100 people is 30%; 20 out of 40 is 50%. The group with fewer survivors has the higher survival rate.
+
+    Change **Group by** and compare both the counts and the percentages. Try every field in the list.
+
+    **Be careful with “why”.** If two things appear together in the data, that does not prove one caused the other. A higher survival rate in one ticket class does not, by itself, explain why those passengers survived.
   </script>
   <script id="6" type="module" pinned>
     function summarize(rows, key) {
@@ -126,12 +153,21 @@
       x: {label: groupField}, height: 300
     }));
   </script>
+  <script id="54" type="text/markdown" data-note>
+    **Your turn.** Answer all three.
+
+    1. Write one sentence with a group size and a survival rate.
+    2. Which field splits the passengers into the most different groups?
+    3. Write one question this data cannot answer.
+  </script>
   <script id="8" type="text/markdown">
     ## Turn age into groups
+
     Age has many different values. We can make it easier to compare people by putting ages into groups. A **cutoff** is the number where we divide the groups.
+
     With a cutoff of `16`, a 15-year-old is in “Under 16” and a 16-year-old is in “16 or older.” A missing age goes in “Unknown age.”
-    Begin at 16 to match our idea. Move the slider: does the pattern stay the same?
-    **Discuss:** Why must unknown age be its own group rather than age zero?
+
+    Move the slider and watch the three groups change.
   </script>
   <script id="9" type="module" pinned>
     const ageCutoff = view(Inputs.range([1, 80], {label: "Age cutoff (strictly younger than)", step: 1, value: 16}));
@@ -144,33 +180,55 @@
       y: {domain: [0, 100], grid: true}, height: 300
     }));
   </script>
-  <script id="11" type="text/markdown">
-    ## Write a manual prediction rule
-    Our starting rule: **first class OR younger than 16 → predict survival. Otherwise → predict non-survival.**
-    Use the age slider in **Find patterns** to change the cutoff. This rule uses your chosen cutoff. A missing age does not count as younger than the cutoff.
-    Before looking at accuracy, make your own estimate. What kind of mistakes do you expect?
-    **Checkpoint:** explain OR in plain language. Would a 40-year-old first-class passenger qualify? Would a 10-year-old third-class passenger qualify? Would a 16-year-old third-class passenger qualify?
+  <script id="55" type="text/markdown" data-note>
+    **Discuss.** Move the slider to 10, then to 30. Does the pattern stay the same? Why must unknown age be its own group rather than age zero?
   </script>
-  <script id="12" type="module" pinned>
+  <script id="11" type="text/markdown" data-chapter="Make your rule">
+    ## Write a manual prediction rule
+
+    Our starting rule: **first class OR younger than 16 → predict survival. Otherwise → predict non-survival.**
+
+    A missing age does not count as “younger than 16”.
+  </script>
+  <script id="56" type="text/markdown" data-note>
+    **Checkpoint.** Explain OR in plain language. Does the rule predict survival for a 40-year-old in first class? A 10-year-old in third class? A 16-year-old in third class?
+  </script>
+  <script id="60" type="text/markdown">
+    The slider sets the age in the rule. The code below it **is** the rule. This is the cell you will edit when you try your own rule.
+  </script>
+  <script id="61" type="module" pinned>
+    const ruleCutoff = view(Inputs.range([1, 80], {label: "Age in the rule (younger than)", step: 1, value: 16}));
+  </script>
+  <script id="12" type="module" pinned data-open>
+    // Describe your rule in words. Update this sentence when you change the rule.
+    const ruleName = `First class OR younger than ${ruleCutoff}`;
+
     function predictSurvival(p) {
       const firstClass = p.pclass === 1;
-      const child = p.age != null && p.age < ageCutoff;
+      const child = p.age != null && p.age < ruleCutoff;
       return firstClass || child ? 1 : 0;
     }
+
     const predictions = passengers.map(p => ({...p, predicted: predictSurvival(p)}));
+    display(`Rule: ${ruleName}. It predicts survival for ${predictions.filter(p => p.predicted === 1).length} of ${predictions.length} passengers.`);
   </script>
   <script id="13" type="text/markdown">
     ## Compare predictions with reality
+
     **Accuracy** tells us how often our prediction is right. If a rule gets 8 out of 10 people right, its accuracy is `80%`.
-    A **baseline** is a simple guess we use for comparison. Here it is “predict non-survival for everyone.” Our rule should do better than this easy starting guess to be useful.
+
+    A **baseline** is a simple guess we use for comparison. Here it is “predict non-survival for everyone.” A rule is only useful if it beats this easy guess.
   </script>
-  <script id="14" type="module" pinned>
+  <script id="14" type="module" pinned data-guess="Out of every 100 passengers, how many do you think this rule gets right?">
     const correct = predictions.filter(p => p.predicted === p.survived).length;
     const baselineCorrect = passengers.filter(p => p.survived === 0).length;
     display(Inputs.table([
-      {rule: "First class OR below age cutoff", correct, total: passengers.length, "accuracy (%)": +(100 * correct / passengers.length).toFixed(2)},
-      {rule: "Always predict non-survival", correct: baselineCorrect, total: passengers.length, "accuracy (%)": +(100 * baselineCorrect / passengers.length).toFixed(2)}
+      {rule: ruleName, correct, total: passengers.length, "accuracy (%)": +(100 * correct / passengers.length).toFixed(2)},
+      {rule: "Baseline: always predict non-survival", correct: baselineCorrect, total: passengers.length, "accuracy (%)": +(100 * baselineCorrect / passengers.length).toFixed(2)}
     ]));
+  </script>
+  <script id="62" type="text/markdown">
+    The next result sorts every passenger into one of four boxes: the rule predicted survival or not, and the person survived or not.
   </script>
   <script id="15" type="module" pinned>
     const comparison = [0, 1].flatMap(predicted => [0, 1].map(actual => ({
@@ -185,9 +243,10 @@
   </script>
   <script id="16" type="text/markdown">
     ## Investigate mistakes
-    Select the type of mistake and read the individual records. Can you explain a mistaken prediction without inventing facts?
+
     A **false positive** predicts survival for someone who died. A **false negative** predicts non-survival for someone who survived. These are prediction errors, not judgments about the people.
-    **Your turn:** find one example of each mistake. Explain why a pattern for a whole group cannot tell you what happened to every person in it.
+
+    Select the type of mistake and read the individual records.
   </script>
   <script id="17" type="module" pinned>
     const mistakeType = view(Inputs.select(["All mistakes", "Predicted survival, but died", "Predicted non-survival, but survived"], {label: "Show"}));
@@ -199,26 +258,33 @@
     ));
     display(Inputs.table(mistakes, {columns: ["name", "pclass", "sex", "age", "predicted", "survived"]}));
   </script>
+  <script id="57" type="text/markdown" data-note>
+    **Your turn.** Find one example of each kind of mistake and write the two names. Why can a pattern for a whole group not tell you what happened to every person in it?
+  </script>
   <script id="19" type="text/markdown">
     ## Propose the next experiment
-    1. Write a different rule in plain language before changing the code.
-    2. Change only `predictSurvival` and watch the comparison update.
-    3. Report accuracy, both kinds of mistakes, and what you still do not know.
 
-    **Record your hypothesis:** “I expect ___ because ___.” Then record your result: “The rule got ___ correct, but failed when ___.” Keep the evidence even if the hypothesis fails.
+    1. Write a different rule in plain language first.
+    2. Go back to the rule cell. Change `ruleName` to your sentence, and change `predictSurvival` to match it.
+    3. Press **Run**. Every result in this chapter updates.
 
-    **What this score cannot tell you:** you used the same records to explore ideas and check your rule. A rule that works well here may do worse on new records. Next, you will separate the examples used for learning from the examples used for checking.
+    Short of ideas? Look again at your charts in **Find patterns**. Which field separated the groups most?
 
-    **Web design challenge:** How would you present a prediction to a visitor so they understand its uncertainty? Group survival rates are not guarantees for individual people.
-
+    **What this score cannot tell you.** You used the same records to explore ideas and to check your rule. A rule that works well here may do worse on new records. In the next chapter you will separate the examples used for learning from the examples used for checking.
   </script>
-  <script id="40" type="text/markdown">
+  <script id="58" type="text/markdown" data-note>
+    **Record your experiment.** “I expect ___ because ___.” Then: “The rule got ___ of 1,309 correct. It failed when ___.” Keep the evidence even if your idea did not work.
+  </script>
+  <script id="40" type="text/markdown" data-chapter="Teach a model">
     ## First, watch a tree learn from just 10 examples
+
     Before we use the Titanic data, start with a tiny array. These **10 passengers are made up** so we can follow every step. The answers are also made up; they are not historical claims.
+
     A **decision stump** is a tree with one yes/no question. We will try two questions: “Is the passenger in first class?” and “Is the passenger younger than 16?”
+
     **Watch → guess → step forward.** At each split, count the `1` and `0` answers in both groups. The most common answer becomes that group's prediction.
   </script>
-  <script id="41" type="module" pinned>
+  <script id="41" type="module" pinned data-open>
     const toyPassengers = [
       {id: "A", age: 45, pclass: 1, survived: 1},
       {id: "B", age: 14, pclass: 1, survived: 1},
@@ -240,19 +306,24 @@
   </script>
   <script id="43" type="text/markdown">
     ### What did the computer learn?
+
     It chose a **question** and the **prediction for each branch**. We supplied possible questions and example answers; the program compared the results.
+
     With the starting array, first class gets **7 of 10** right. Age below 16 gets **9 of 10** right, so it wins. Passenger A is the exception: the age rule predicts `0`, but A's label is `1`.
+
     **This 90% is a score on the same 10 made-up training examples.** It is not an accuracy result for Titanic or for new passengers.
-    **Try changing the data:** open the array, change A's `survived` value from `1` to `0`, and press Run. The animation updates. Restart it and explain why the age rule now gets 10 of 10 right. Then change A back.
-    A bigger **decision tree** repeats this idea: after the first question, it can ask another question inside a group. The library below chooses splits using *Gini impurity*—a way to measure how mixed the `1` and `0` labels are. The animation uses correct-answer counts to introduce the idea simply.
+
+    A bigger **decision tree** repeats this idea: after the first question, it can ask another question inside each group.
+  </script>
+  <script id="59" type="text/markdown" data-note>
+    **Try changing the data.** In the array above, change A's `survived` value from `1` to `0` and press **Run**. Restart the animation. Why does the age question now get 10 of 10 right? Then press **↺ Reset** to put A back.
   </script>
   <script id="21" type="text/markdown">
     ## From a manual rule to machine learning
-    We wrote the first rule ourselves. Now we will give the computer passenger examples and their real answers. The computer will try several rules and choose one that works well on those examples. This is called **supervised learning**: learning from examples that include answers.
 
-    Our model is a **decision stump**. This is a small decision tree that asks just one yes/no question. For example: “Is the passenger in first class?” A yes sends the passenger to one group; a no sends them to the other group. Each group predicts whichever answer was more common in its learning examples.
-    **Small made-up example:** if 7 of 10 people in the yes group survived, that group predicts survival. If 2 of 10 people in the no group survived, that group predicts non-survival. The program tries several questions and chooses the one with the fewest wrong answers in the training data.
-    The result is a **model**: a learned rule we can reuse. This small model finds patterns; it does not know the full story of why each person survived or died.
+    You wrote the first rule yourself. Now we give the computer passenger examples **with their real answers**. The computer tries several questions and keeps the one that makes the fewest mistakes on those examples. This is called **supervised learning**: learning from examples that include answers.
+
+    The result is a **model**: a learned rule we can reuse. A model finds patterns; it does not know the full story of why each person survived or died.
 
     | Concept | In this experiment |
     |---|---|
@@ -261,15 +332,14 @@
     | Training | Learn from examples with answers, like studying practice questions |
     | Prediction | Use the learned rule to guess an answer without looking at it |
     | Testing | Try examples the training code did not use, then check the answers |
-    | Overfitting | Fit the practice examples very closely but do poorly on new ones, like memorizing answers without learning a useful rule |
-
-    **Before running:** will a learned rule necessarily beat our manual rule? What evidence would convince you?
 
     ### Split the data the same way each time
-    The helper below mixes up survivors and non-survivors separately. About 80% of each group becomes the **training set**: examples used to learn. The other 20% becomes the **test set**: examples used to check the learned rule.
-    Think of 100 example cards: about 80 are for learning and 20 are for checking. Our real dataset is larger. A **seed** is a starting number for the shuffle; using `42` every time gives us the same split.
-    In this simple model, unknown ages form a separate candidate group; age comparisons treat unknown age as “condition not met.” No missing age is converted to zero.
-    **Keep your test fair:** you have already explored the full table, so this is practice at splitting data, not a completely new final test. In a new project, put test records aside before exploring. Passengers from the same family or ticket may also have similar stories. If they appear in both sets, the test may be easier than a test on completely new groups.
+
+    Think of 100 example cards: about 80 are for learning and 20 are for checking. The **training set** is the examples used to learn. The **test set** is the examples used to check the learned rule.
+
+    The helper below shuffles survivors and non-survivors separately, so both sets keep the same mix. A **seed** is the starting number for the shuffle; using `42` every time gives the same split.
+
+    **Keep your test fair.** You have already explored the full table, so this is practice at splitting data, not a perfectly fresh test. In a new project, put the test records aside before you explore.
   </script>
   <script id="22" type="module" pinned>
     function splitPassengers(rows, seed = 42) {
@@ -296,8 +366,10 @@
   </script>
   <script id="23" type="text/markdown">
     ## Train: let the examples choose the rule
-    Run the helper cell, then the training cell. You do not need to memorize this code. Explain its four actions: **try a question → divide rows → predict the majority in each branch → count mistakes**.
-    Read the list of possible questions and the number of mistakes for each. If two questions have the same score, the code keeps the earlier one. If a branch has equal numbers of survivors and non-survivors, it predicts `0`. Follow these choices to explain how this one-question model learns.
+
+    The next cell is the learning code. You do not need to memorize it. Its four actions are: **try a question → divide the rows → predict the majority in each group → count the mistakes**.
+
+    The candidate questions are about ticket class, age, unknown age, and recorded sex. If two questions make the same number of mistakes, the code keeps the earlier one. If a group has equal numbers of survivors and non-survivors, it predicts `0`.
   </script>
   <script id="24" type="module" pinned>
     function majority(rows) {
@@ -323,60 +395,69 @@
       return {model: ranked[0], ranked};
     }
   </script>
-  <script id="25" type="module" pinned>
+  <script id="25" type="module" pinned data-guess="Which question will the computer choose: one about ticket class, about age, or about sex?">
     const learned = trainStump(split.train);
     display(`Learned question: ${learned.model.question}`);
     display(`YES → predict ${learned.model.yesPrediction}; NO → predict ${learned.model.noPrediction} (1 = survives, 0 = does not survive).`);
     display(Inputs.table(learned.ranked.map(rule => ({
       question: rule.question, "training mistakes": rule.mistakes,
-      "yes branch size": rule.yesCount, "no branch size": rule.noCount
+      "yes group size": rule.yesCount, "no group size": rule.noCount
     }))));
   </script>
   <script id="26" type="text/markdown">
     ## Test: compare three approaches on the same people
-    The baseline learns only the majority outcome in training. The manual rule stays fixed at first class OR age under 16. The stump chooses its question using training rows only.
-    Compare all three on exactly the same test passengers. Do not compare test accuracy here directly with the earlier full-dataset accuracy: the passenger sets differ.
-    **Accuracy:** out of all passengers, how many did we get right? Example: 80 correct out of 100 = `80%`.
-    **Survivor recall:** out of the people who really survived, how many did we find? Example: we found 6 of 10 real survivors = `60%`.
-    **Survivor precision:** out of the people we said would survive, how many really did? Example: 6 of our 8 survival predictions were right = `75%`.
-    These are made-up examples to explain the scores. The table below shows our real results. A blank score means there were no people in the group we would divide by—for example, precision is blank when the rule predicts no survivors.
-    **Your turn:** name the rule with the highest test accuracy, then describe one mistake it still makes. Why would it be unfair to keep changing the rule until it fits the test answers? If you want to try many designs, use a third group of records called a **validation set** to compare them. Save the test set for your final check.
+
+    Now check on the 262 test passengers. None of them were used for learning.
+
+    - The **baseline** predicts the most common training answer for everyone.
+    - **Your rule** is the one you wrote in **Make your rule**.
+    - The **learned question** was chosen by the computer, using training rows only.
+
+    Do not compare these numbers with the full-table accuracy from the last chapter: the passengers are different.
+
+    **Keep the test fair.** If you keep changing a rule until it fits the test answers, the test stops being a fair check.
   </script>
   <script id="27" type="module" pinned>
     function evaluateRule(name, rows, predict) {
-      const tp = rows.filter(p => predict(p) === 1 && p.survived === 1).length;
-      const tn = rows.filter(p => predict(p) === 0 && p.survived === 0).length;
-      const fp = rows.filter(p => predict(p) === 1 && p.survived === 0).length;
-      const fn = rows.filter(p => predict(p) === 0 && p.survived === 1).length;
-      const percent = (a, b) => b ? +(100 * a / b).toFixed(2) : null;
-      return {rule: name, passengers: rows.length, "accuracy (%)": percent(tp + tn, rows.length),
-        "survivor recall (%)": percent(tp, tp + fn), "survivor precision (%)": percent(tp, tp + fp),
-        "false positives": fp, "false negatives": fn};
+      const correct = rows.filter(p => predict(p) === p.survived).length;
+      const falsePositives = rows.filter(p => predict(p) === 1 && p.survived === 0).length;
+      const falseNegatives = rows.filter(p => predict(p) === 0 && p.survived === 1).length;
+      return {rule: name, passengers: rows.length, correct,
+        "accuracy (%)": +(100 * correct / rows.length).toFixed(2),
+        "false positives": falsePositives, "false negatives": falseNegatives};
     }
     const baselineOutcome = majority(split.train);
-    const frozenManual = p => p.pclass === 1 || (p.age != null && p.age < 16) ? 1 : 0;
     const testScores = [
-      evaluateRule("Training-majority baseline", split.test, () => baselineOutcome),
-      evaluateRule("Manual rule (under 16)", split.test, frozenManual),
-      evaluateRule("Learned stump", split.test, learned.model.predict)
+      evaluateRule("Baseline (majority guess)", split.test, () => baselineOutcome),
+      evaluateRule("Your rule", split.test, predictSurvival),
+      evaluateRule("One learned question", split.test, learned.model.predict)
     ];
+    display(`Your rule: ${ruleName}. Learned question: ${learned.model.question}`);
     display(Inputs.table(testScores));
     display(Plot.barX(testScores, {y: "rule", x: "accuracy (%)", tip: true}).plot({
-      x: {domain: [0, 100], grid: true}, marginLeft: 200, height: 220
+      x: {domain: [0, 100], grid: true}, y: {domain: testScores.map(d => d.rule), label: null},
+      marginLeft: 170, height: 200
     }));
     display(Inputs.table([
-      evaluateRule("Stump: training", split.train, learned.model.predict),
-      evaluateRule("Stump: test", split.test, learned.model.predict)
+      evaluateRule("Learned question · training", split.train, learned.model.predict),
+      evaluateRule("Learned question · test", split.test, learned.model.predict)
     ]));
   </script>
-  <script id="35" type="text/markdown">
-    ## Can we reach 90% accuracy?
-    Yes—on the examples used for learning, a more detailed model can score over 90%. But the score on other passengers can be lower.
-    A deeper tree asks several questions in a row. It can use class, sex, age, fare, and family counts together. The next experiment compares two fixed designs: a small tree (up to 4 questions along a path) and a deep tree (up to 12).
-    Missing numeric inputs use the middle value from the **training rows only**. We exclude names, tickets, cabins, ports, destinations, survival, lifeboats, and body IDs from the prediction inputs.
-    **Guess first:** will the deeper tree do better on both sets, or just on training?
+  <script id="63" type="text/markdown" data-note>
+    **Your turn.** Which approach got the most test passengers right? How many more than your rule? The computer asked only one question. What does that tell you about the first rule?
   </script>
-  <script id="36" type="module" pinned>
+  <script id="35" type="text/markdown" data-chapter="Grow a tree">
+    ## Grow a tree: ask more than one question
+
+    One question already does well. A **decision tree** asks several questions in a row. After “Is the passenger female?”, it can ask a different next question inside each group.
+
+    Our trees may use six inputs: ticket class, sex, age, fare, siblings or spouse aboard, and parents or children aboard. Names, tickets, cabins, ports, and destinations are left out. So are `survived`, `boat`, and `body`, because they reveal the answer.
+
+    A blank age or fare is replaced by the middle value of the **training rows only**.
+
+    We compare two trees: a **small tree** (up to 4 questions in a row) and a **deep tree** (up to 12).
+  </script>
+  <script id="36" type="module" pinned data-guess="Will the deep tree beat the small tree on training passengers, on test passengers, on both, or on neither?">
     import { trainTree } from "./ml.js";
     const smallTree = trainTree(split.train, {maxDepth: 4, minLeaf: 8});
     const deepTree = trainTree(split.train, {maxDepth: 12, minLeaf: 1});
@@ -388,109 +469,273 @@
     ];
     display(Inputs.table(treeScores));
     display(Plot.barX(treeScores, {y: "rule", x: "accuracy (%)", fill: "rule", tip: true}).plot({
-      marginLeft: 170, x: {domain: [0, 100], grid: true}, height: 240
+      x: {domain: [0, 100], grid: true}, y: {domain: treeScores.map(d => d.rule), label: null},
+      marginLeft: 170, height: 240
+    }));
+  </script>
+  <script id="64" type="text/markdown">
+    ### Watch the gap open
+
+    The next chart trains twelve trees, from 1 question deep to 12 questions deep. It scores each tree twice: on its training passengers and on the test passengers.
+
+    Move the slider to read both scores at any depth.
+  </script>
+  <script id="65" type="module" pinned>
+    // Train one tree for each depth, and score it on both sets.
+    const depthScores = d3.range(1, 13).flatMap(maxDepth => {
+      const tree = trainTree(split.train, {maxDepth, minLeaf: 1});
+      const accuracy = rows => +(100 * rows.filter(p => tree.predict(p) === p.survived).length / rows.length).toFixed(1);
+      return [
+        {depth: maxDepth, set: "Training", "accuracy (%)": accuracy(split.train)},
+        {depth: maxDepth, set: "Test", "accuracy (%)": accuracy(split.test)}
+      ];
+    });
+    const depth = view(Inputs.range([1, 12], {label: "Tree depth (questions in a row)", step: 1, value: 4}));
+  </script>
+  <script id="66" type="module" pinned>
+    const atDepth = depthScores.filter(d => d.depth === depth);
+    display(Inputs.table(atDepth));
+    display(Plot.plot({
+      x: {label: "Tree depth (questions in a row)", ticks: 12},
+      y: {domain: [70, 100], grid: true, label: "Accuracy (%)"},
+      color: {legend: true},
+      marks: [
+        Plot.ruleX([depth], {stroke: "#999", strokeDasharray: "4 3"}),
+        Plot.lineY(depthScores, {x: "depth", y: "accuracy (%)", stroke: "set"}),
+        Plot.dot(depthScores, {x: "depth", y: "accuracy (%)", fill: "set", tip: true})
+      ],
+      height: 300
     }));
   </script>
   <script id="37" type="text/markdown">
     ### A high score needs a label
-    **Training score** asks “How well did the model learn the examples it studied?” **Test score** asks “How well does it work on examples the training code did not use?”
-    The deep tree can fit small details in the training data. Some details do not help on other passengers. This is **overfitting**. A 90% training score does not promise 90% accuracy on new people.
-    Compare the two designs as they are. Use the results to explain what changes when a tree gets deeper. In your own project, choose settings with validation data, then check a fresh test set once. Remember that you already explored this full table, so use this experiment to practise the method rather than claim a final score on completely unseen data.
+
+    The training line keeps climbing: a deeper tree fits its own examples better and better. The test line does not follow it. After a few questions it stops improving, and then it drifts down.
+
+    The deep tree has fitted small details of its training passengers that do not help with other passengers. This is **overfitting**. Its sign is a **large gap between the training score and the test score**.
+
     **Say it clearly:** “Our model got ___% on ___ passengers in the ___ set.” Never report an accuracy number without saying which set it describes.
   </script>
-  <script id="44" type="text/markdown">
-    ## Now use a real ML library on Titanic
-    Now train a tree with **ml-cart**, a JavaScript library included in your project. Follow the full example below: load the data → split it → fill missing inputs → train → predict → check results.
-    You can run this cell on its own. It reads the CSV again and makes the same 80/20 split. Follow the numbered comments to find each step; you do not need to memorize every line.
-
-    | Code name | Simple meaning |
-    |---|---|
-    | `Xtrain` | A list of input rows: class, sex, age, fare, siblings/spouse, parents/children |
-    | `ytrain` | The correct survival answer for each training row |
-    | `model.train(Xtrain, ytrain)` | Learn the tree from those examples |
-    | `model.predict(Xtest)` | Predict the test answers without supplying their labels |
-    | `accuracy` | Compare the predictions with the real answers after prediction |
-
-    Example input: `[3, 1, 25, 15, 0, 0]` means third class, female, age 25, fare £15, no siblings/spouse, and no parents/children aboard. Here `0 = male` and `1 = female` are category codes, not scores.
-    We set `maxDepth: 4` before checking results. Missing numeric values use medians from training rows only. `survived`, `boat`, and `body` never appear in an input row.
-    The library may give different results from our hand-written tree because its split and stopping rules differ. We compare results without changing settings to chase a test score.
-    Package reference: [ml-cart documentation](https://mljs.github.io/decision-tree-cart/).
+  <script id="67" type="text/markdown" data-note>
+    **Your turn.** At which depth is the test score highest? How large is the gap between training and test at depth 12? Would you trust a model that reports only its training score?
   </script>
-  <script id="45" type="module" pinned>
+  <script id="68" type="text/markdown">
+    ### Read the tree the computer built
+
+    This is the small tree, written as text. Each indented line is a question. Each arrow is a final prediction, with the training passengers that reached it.
+  </script>
+  <script id="69" type="module" pinned>
+    const treeText = document.createElement("pre");
+    treeText.className = "tree";
+    treeText.textContent = smallTree.describe();
+    display(treeText);
+  </script>
+  <script id="70" type="text/markdown" data-note>
+    **Your turn.** The first question is about sex. Find one group of male passengers the tree predicts will survive, and one group of female passengers it predicts will not. Which later questions decide this?
+  </script>
+  <script id="44" type="text/markdown">
+    ## Use a real machine-learning library
+
+    You have seen how a tree learns. You do not need to write the learning code yourself: programmers share it as a **library**. We use **ml-cart**, a JavaScript library for decision trees.
+
+    Almost every machine-learning library is used in the same five steps:
+
+    | Step | In the code | Meaning |
+    |---|---|---|
+    | 1. Prepare | `medians`, `encode` | Fill blanks and turn each passenger into a row of numbers |
+    | 2. Separate | `Xtrain`, `ytrain`, `Xtest`, `ytest` | `X` holds the input rows; `y` holds the answers |
+    | 3. Train | `libraryModel.train(Xtrain, ytrain)` | Learn a tree from the training inputs and answers |
+    | 4. Predict | `libraryModel.predict(Xtest)` | Predict from the test inputs only |
+    | 5. Check | compare with `ytest` | Count how many predictions match the real answers |
+
+    Example input row: `[3, 1, 25, 15, 0, 0]` means third class, female, age 25, fare £15, no siblings or spouse, and no parents or children aboard. `1 = female` and `0 = male` are codes, not scores.
+
+    The first cell does steps 1 and 2.
+  </script>
+  <script id="71" type="module" pinned data-open>
+    // 1. Fill blanks with the middle value (the median) of the TRAINING rows only.
+    const numericFields = ["pclass", "age", "fare", "sibsp", "parch"];
+    const medians = Object.fromEntries(numericFields.map(field => [field, d3.median(split.train, p => p[field])]));
+
+    // 2. Turn each passenger into a row of six numbers. The answer is NOT in the row.
+    //    a ?? b means: use a, but if a is missing, use b.
+    const encode = p => [
+      p.pclass ?? medians.pclass,
+      p.sex === "female" ? 1 : 0,
+      p.age ?? medians.age,
+      p.fare ?? medians.fare,
+      p.sibsp ?? medians.sibsp,
+      p.parch ?? medians.parch
+    ];
+    const Xtrain = split.train.map(encode);
+    const ytrain = split.train.map(p => p.survived);
+    const Xtest = split.test.map(encode);
+    const ytest = split.test.map(p => p.survived);
+
+    display(Inputs.table(split.train.slice(0, 5).map((p, i) => ({
+      passenger: p.name, "input row (X)": Xtrain[i].join(", "), "answer (y)": ytrain[i]
+    }))));
+  </script>
+  <script id="72" type="text/markdown">
+    The second cell does steps 3, 4, and 5. `maxDepth: 4` allows up to 4 questions in a row. `minNumSamples: 8` stops dividing a group once it has 8 passengers or fewer. We chose these settings before looking at the results.
+  </script>
+  <script id="45" type="module" pinned data-open data-guess="How many of the 262 test passengers will the library tree get right, using six inputs? Look back at the score for one learned question.">
     import { DecisionTreeClassifier } from "./cart-library.js";
 
-    const libraryRun = await (async () => {
-      // 1. Load all passenger records. Blank values stay missing.
-      const rows = await FileAttachment("assets/titanic.csv").csv({typed: true});
+    // 3. Train. The model sees the training inputs and the training answers.
+    const libraryModel = new DecisionTreeClassifier({maxDepth: 4, minNumSamples: 8});
+    libraryModel.train(Xtrain, ytrain);
 
-      // 2. Make a repeatable 80/20 split, keeping both outcomes in each set.
-      let seed = 42;
-      const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
-      const train = [], test = [];
-      for (const label of [0, 1]) {
-        const group = rows.filter(p => p.survived === label);
-        for (let i = group.length - 1; i > 0; i--) {
-          const j = Math.floor(random() * (i + 1));
-          [group[i], group[j]] = [group[j], group[i]];
-        }
-        const cut = Math.floor(group.length * 0.8);
-        train.push(...group.slice(0, cut));
-        test.push(...group.slice(cut));
-      }
+    // 4. Predict. The model gets inputs only, never the answers.
+    const predictedTest = libraryModel.predict(Xtest);
+    const libraryPredict = p => libraryModel.predict([encode(p)])[0];
 
-      // 3. Learn missing-value replacements from TRAINING rows only.
-      const numericFields = ["pclass", "age", "fare", "sibsp", "parch"];
-      const medians = Object.fromEntries(numericFields.map(field => {
-        const values = train.map(p => p[field]).filter(v => v != null && Number.isFinite(v)).sort((a, b) => a - b);
-        if (!values.length) throw new Error(`No known training values for ${field}`);
-        return [field, (values[Math.floor((values.length - 1) / 2)] + values[Math.floor(values.length / 2)]) / 2];
-      }));
-      const number = (p, field) => p[field] == null ? medians[field] : p[field];
-      const encode = p => [number(p, "pclass"), p.sex === "female" ? 1 : 0,
-        number(p, "age"), number(p, "fare"), number(p, "sibsp"), number(p, "parch")];
-      const Xtrain = train.map(encode);
-      const ytrain = train.map(p => p.survived);
-      const Xtest = test.map(encode);
-      const ytest = test.map(p => p.survived);
-
-      // 4. Train the library model. It never receives test answers here.
-      const model = new DecisionTreeClassifier({gainFunction: "gini", maxDepth: 4, minNumSamples: 8});
-      model.train(Xtrain, ytrain);
-
-      // 5. Make predictions, then compare them with the real answers.
-      const predictedTrain = model.predict(Xtrain);
-      const predictedTest = model.predict(Xtest);
-      const score = (set, actual, predicted) => {
-        const correct = actual.filter((answer, i) => answer === predicted[i]).length;
-        const falsePositives = actual.filter((answer, i) => answer === 0 && predicted[i] === 1).length;
-        const falseNegatives = actual.filter((answer, i) => answer === 1 && predicted[i] === 0).length;
-        return {set, passengers: actual.length, correct,
-          "accuracy (%)": +(100 * correct / actual.length).toFixed(2),
-          "false positives": falsePositives, "false negatives": falseNegatives};
-      };
-      return {model, encode, train, test,
-        scores: [score("Training", ytrain, predictedTrain), score("Test", ytest, predictedTest)],
-        examples: test.map((p, i) => ({name: p.name, age: p.age, pclass: p.pclass,
-          actual: p.survived, predicted: predictedTest[i], correct: p.survived === predictedTest[i]}))};
-    })();
-
-    // 6. Show your scores, chart, and individual test predictions.
-    display(Inputs.table(libraryRun.scores));
-    display(Plot.barX(libraryRun.scores, {y: "set", x: "accuracy (%)", fill: "set", tip: true})
-      .plot({x: {domain: [0, 100], grid: true}, height: 170, marginLeft: 75}));
-    display(Inputs.table(libraryRun.examples, {columns: ["name", "age", "pclass", "actual", "predicted", "correct"]}));
+    // 5. Check: compare each prediction with the real answer.
+    display(Inputs.table([
+      evaluateRule("Library tree · training", split.train, libraryPredict),
+      evaluateRule("Library tree · test", split.test, libraryPredict)
+    ]));
+    display(Inputs.table(split.test.map((p, i) => ({
+      name: p.name, sex: p.sex, age: p.age, pclass: p.pclass,
+      actual: ytest[i], predicted: predictedTest[i], correct: ytest[i] === predictedTest[i]
+    }))));
   </script>
   <script id="46" type="text/markdown">
     ### Read the results before moving on
-    There are **1,047 training passengers** and **262 test passengers**. The first table reports both sets. The last table shows every test prediction, including mistakes.
-    **Check one record:** find a row where `correct` is false. Explain the difference between its real answer and its predicted answer.
-    **Say what happened:** “We trained on ___ passengers. On the test set, ___ out of ___ predictions were correct.” The next chapter lets you use this library model with your own inputs.
+
+    There are **1,047 training passengers** and **262 test passengers**. The first table reports both sets. The second table shows every test prediction, including the mistakes.
+
+    Package reference: [ml-cart documentation](https://mljs.github.io/decision-tree-cart/).
   </script>
-  <script id="28" type="text/markdown">
+  <script id="73" type="text/markdown" data-note>
+    **Check one record.** Find a row where `correct` is false. What was the real answer, and what did the model predict? Then complete: “We trained on ___ passengers. On the test set, ___ of ___ predictions were correct.”
+  </script>
+  <script id="74" type="text/markdown" data-chapter="Check the model">
+    ## Check the model: is it good?
+
+    A score means little alone. Compare it with something. This table puts every approach from the lesson on the **same 262 test passengers**.
+  </script>
+  <script id="75" type="module" pinned>
+    const allScores = [
+      evaluateRule("Baseline (majority guess)", split.test, () => baselineOutcome),
+      evaluateRule("Your rule", split.test, predictSurvival),
+      evaluateRule("One learned question", split.test, learned.model.predict),
+      evaluateRule("Small tree, depth 4", split.test, smallTree.predict),
+      evaluateRule("Deep tree, depth 12", split.test, deepTree.predict),
+      evaluateRule("Library tree, depth 4", split.test, libraryPredict)
+    ];
+    display(Inputs.table(allScores));
+    display(Plot.barX(allScores, {y: "rule", x: "correct", tip: true}).plot({
+      x: {domain: [0, split.test.length], grid: true, label: `Correct predictions out of ${split.test.length} test passengers`},
+      y: {domain: allScores.map(d => d.rule), label: null}, marginLeft: 170, height: 260
+    }));
+  </script>
+  <script id="76" type="text/markdown">
+    ### What the table says
+
+    With the starting settings, the correct predictions are: baseline 162, starting rule 179, one learned question 207, small tree 211, deep tree 206, library tree 212.
+
+    - The biggest jump comes from **one question**. Asking about sex gets 28 more passengers right than the starting rule.
+    - Five more inputs and a real library add about **5 more**.
+    - The deep tree is the most complicated model here, and it is not the best.
+
+    More complicated is not automatically better. Always ask: *better than what, and by how much?*
+  </script>
+  <script id="77" type="text/markdown" data-note>
+    **Your turn.** Is the library tree a good model? Give one reason for “yes” and one reason for doubt. Use numbers from the table.
+  </script>
+  <script id="78" type="text/markdown">
+    ## Was it luck? Shuffle again
+
+    The split into training and test passengers used seed `42`. A different seed puts different passengers in the test set, so every score changes a little.
+
+    Move the slider and watch both scores. Is the tree always ahead?
+  </script>
+  <script id="79" type="module" pinned>
+    const trySeed = view(Inputs.range([1, 100], {label: "Shuffle seed", step: 1, value: 42}));
+  </script>
+  <script id="80" type="module" pinned>
+    const trySplit = splitPassengers(passengers, trySeed);
+    const tryQuestion = trainStump(trySplit.train).model;
+    const tryTree = trainTree(trySplit.train, {maxDepth: 4, minLeaf: 8});
+    display(Inputs.table([
+      evaluateRule(`One learned question (${tryQuestion.question})`, trySplit.test, tryQuestion.predict),
+      evaluateRule("Small tree, depth 4", trySplit.test, tryTree.predict)
+    ]));
+  </script>
+  <script id="81" type="text/markdown">
+    One shuffle at a time is hard to compare. The next chart repeats the experiment for 20 seeds. Each row is one shuffle. The two dots are the two models, tested on the same passengers.
+  </script>
+  <script id="82" type="module" pinned>
+    const manySeeds = d3.range(1, 21).map(seed => {
+      const shuffled = splitPassengers(passengers, seed);
+      const question = trainStump(shuffled.train).model;
+      const tree = trainTree(shuffled.train, {maxDepth: 4, minLeaf: 8});
+      const count = predict => shuffled.test.filter(p => predict(p) === p.survived).length;
+      return {seed, question: count(question.predict), tree: count(tree.predict)};
+    });
+    const treeWins = manySeeds.filter(d => d.tree > d.question).length;
+    display(`In ${manySeeds.length} shuffles, the small tree got more test passengers right ${treeWins} times.`);
+    display(Plot.plot({
+      x: {label: "Correct predictions out of 262 test passengers", grid: true},
+      y: {label: "Shuffle seed", ticks: 20},
+      color: {legend: true},
+      marks: [
+        Plot.link(manySeeds, {x1: "question", x2: "tree", y: "seed", stroke: "#bbb"}),
+        Plot.dot(manySeeds.flatMap(d => [
+          {seed: d.seed, model: "One learned question", correct: d.question},
+          {seed: d.seed, model: "Small tree, depth 4", correct: d.tree}
+        ]), {x: "correct", y: "seed", fill: "model", r: 4, tip: true})
+      ],
+      height: 420
+    }));
+  </script>
+  <script id="83" type="text/markdown" data-note>
+    **Your turn.** What are the lowest and the highest scores of the small tree in the chart? A classmate says: “My model got 82% and yours got 80%, so mine is better.” What would you ask them?
+  </script>
+  <script id="84" type="text/markdown">
+    ## Who does the model get wrong?
+
+    One overall score can hide very different results for different groups. Check the library tree's test accuracy group by group.
+  </script>
+  <script id="85" type="module" pinned>
+    const checkField = view(Inputs.select(["sex", "pclass"], {label: "Check accuracy by", value: "sex"}));
+  </script>
+  <script id="86" type="module" pinned>
+    const byGroup = d3.groups(split.test, p => String(p[checkField]))
+      .map(([group, members]) => evaluateRule(`${checkField} = ${group}`, members, libraryPredict))
+      .sort((a, b) => d3.ascending(a.rule, b.rule));
+    display(Inputs.table(byGroup));
+    display(Plot.barX(byGroup, {y: "rule", x: "accuracy (%)", tip: true}).plot({
+      x: {domain: [0, 100], grid: true}, y: {label: null}, marginLeft: 110, height: 180
+    }));
+  </script>
+  <script id="87" type="text/markdown" data-note>
+    **Your turn.** Which group has the lower accuracy? Now read the false positives and false negatives. What kind of mistake does the model make for men? For women? Why would that matter if a model like this helped make a real decision?
+  </script>
+  <script id="88" type="text/markdown">
+    ## Going further (optional)
+
+    Read this if you finish early. You do not need it for the rest of the lesson.
+
+    **Precision and recall.** Accuracy counts all correct answers together. Two other scores look only at survivors. *Recall*: of the people who really survived, how many did the model find? *Precision*: of the people the model said would survive, how many really did? You can calculate both from the false positives and false negatives in the tables.
+
+    **How a library chooses a question.** Our small examples counted mistakes. ml-cart uses *Gini impurity*: a number that measures how mixed the `1` and `0` answers are inside a group. It picks the question that leaves the two groups least mixed.
+
+    **Validation set.** We chose `maxDepth: 4` before looking at the test results. To try many settings fairly, use a third group of records, called a *validation set*, to choose between them. Save the test set for one final check.
+
+    **Families.** Passengers on the same ticket often share an outcome. Some families have members in both the training set and the test set. This makes our test a little easier than a test on completely new people.
+
+    **Challenge.** In **Grow a tree**, open the library cell and change `maxDepth: 4` to `3`, then to `8`. Press **Run** each time and come back to the table at the top of this chapter. Which setting scores best? Why should you not choose a setting this way in a real project? Press **↺ Reset** when you finish.
+  </script>
+  <script id="28" type="text/markdown" data-chapter="Try a prediction">
     ## Use the model in a web interface
-    Training chooses the rule. **Inference** means using the rule to make a new prediction. It does not mean training again.
-    Our form compares the **ml-cart library model** with our **hand-written small tree**. Enter class, age, sex, fare, and family counts. Each model returns `1` or `0`. Neither gets to see a real survival answer.
-    Change the inputs and read the path. A small change may leave the prediction unchanged because the passenger still follows the same branches. The displayed result is a class prediction, not a personal survival probability.
+
+    Training chooses the rule. **Inference** means using the finished rule to make a new prediction. Nothing is trained again.
+
+    The form below sends one made-up passenger to two models: the **library tree** and our **hand-written small tree**. Each answers `survival` or `non-survival`. Neither sees a real answer.
+
+    Change one input at a time. A small change often leaves the prediction unchanged, because the passenger still follows the same branches. The answer is a yes/no prediction, not a personal chance of survival.
   </script>
   <script id="29" type="module" pinned>
     const visitorClass = view(Inputs.select([1, 2, 3], {label: "Ticket class", value: 3}));
@@ -502,45 +747,86 @@
   </script>
   <script id="30" type="module" pinned>
     const visitor = {pclass: visitorClass, age: visitorAge, sex: visitorSex, fare: visitorFare, sibsp: visitorSiblings, parch: visitorParents};
-    const visitorPrediction = smallTree.predict(visitor);
-    const libraryVisitorPrediction = libraryRun.model.predict([libraryRun.encode(visitor)])[0];
-    display(`Library prediction: ${libraryVisitorPrediction === 1 ? "survival" : "non-survival"}.`);
-    display(`Hand-written tree prediction: ${visitorPrediction === 1 ? "survival" : "non-survival"}.`);
-    display(`Hand-written tree path: ${smallTree.explain(visitor)}`);
-    display("Read this as the model's guess from historical patterns. It cannot tell you what would happen to a real person.");
+    const inWords = prediction => prediction === 1 ? "survival" : "non-survival";
+    display(`Library tree predicts: ${inWords(libraryPredict(visitor))}.`);
+    display(`Hand-written small tree predicts: ${inWords(smallTree.predict(visitor))}.`);
+    display(`Its questions for this passenger: ${smallTree.explain(visitor)}`);
+    display("This is the model's guess from historical patterns. It cannot tell you what would happen to a real person.");
   </script>
-  <script id="31" type="text/markdown">
-    ### Get ready to share your discoveries
-    Your model finds patterns in historical records. It does not prove why someone survived. It can repeat unfair patterns from the past, and a good overall score can hide more mistakes for some groups than others.
-    **Show your work:** prepare a short demonstration with your partner. Include one chart, your starting idea, the rule the model learned, its test score, and one wrong prediction. Explain one reason a visitor should not treat its answer as certain.
-    **Before you finish, answer:** What did the model learn? Which records did it learn from? Why did you leave out lifeboats? Why is a training score not enough? What else would you want to check before using the model outside this lesson?
+  <script id="89" type="text/markdown" data-note>
+    **Your turn.** Find one small change that flips the prediction, and one large change that does not. Explain both using the tree's questions.
 
+    **Web design challenge.** How would you show this prediction to a visitor so that they understand it is uncertain?
+  </script>
+  <script id="31" type="text/markdown" data-chapter="Your learning board">
+    ## Get ready to share your discoveries
+
+    Your model finds patterns in historical records. It does not prove why someone survived. It can repeat unfair patterns from the past, and a good overall score can hide more mistakes for some groups than for others.
+
+    **Show your work.** Prepare a two-minute demonstration with your partner. Include one chart, your own rule, the question the computer learned, one test score with its set named, and one wrong prediction.
+  </script>
+  <script id="90" type="text/markdown" data-note>
+    **Before you finish.** Answer in three or four sentences. What did the model learn? Which passengers did it learn from? Why did we leave out the lifeboat field? Why is a training score not enough?
+  </script>
+  <script id="91" type="text/markdown">
+    ## Exit quiz
+
+    Six questions on the main ideas. Answer them on your own, then press **Check my answers**. You can change an answer and check again.
+  </script>
+  <script id="92" type="module" pinned>
+    import { createExitQuiz } from "./exit-quiz.js";
+    display(createExitQuiz());
+  </script>
+  <script id="93" type="text/markdown">
     ## Your learning board · two sessions, 60 minutes each
-    Use this board to track your progress. After each stage, explain the last column to your partner or write a short answer in your notes. The times are a guide. Try the optional challenge after you finish the main activities.
 
-    | Your stage | Suggested time | What to try | What you are learning | Check yourself |
-    |---|---|---|---|---|
-    | Session 1 · Read the records | 10 min | Read a row and explain its values | Rows, fields, inputs, answers, missing values | Can I name three useful inputs and two fields that reveal the answer? |
-    | Ask and filter | 10 min | Write a guess, then look at first class | Asking a question you can check with data | Did I write my guess before checking the result? |
-    | Group and visualize | 15 min | Group by class, sex, or port; compare ages | Counts, percentages, patterns and causes | Can I explain a chart using both a group size and a percentage? |
-    | Write your rule | 10 min | Try first class OR younger than the cutoff | Clear rules and what happens at the cutoff | Can I apply the rule to three example passengers? |
-    | Find mistakes | 15 min | Compare your rule with the baseline | Accuracy and the two kinds of error | Can I show one wrong prediction of each kind? |
-    | Session 2 · Watch a model learn | 10 min | Play the animation and count the votes | Learning a question from examples with answers | Can I explain why one question wins on these 10 examples? |
-    | Separate the data | 10 min | Run the split and check both group sizes | Learning examples and test examples | Can I explain why test answers must not choose the rule? |
-    | Train with a library | 15 min | Follow the full ml-cart example | Inputs, labels, training, and prediction | Can I point to the inputs, answers, train call, and predict call? |
-    | Compare fairly | 10 min | Compare rules on the same test records | Accuracy, precision, recall, and new examples | Can I name the set my score describes and a mistake it hides? |
-    | Try the web form | 10 min | Change one passenger detail at a time | Using a trained model to make a prediction | Can I explain why the answer changed or stayed the same? |
-    | Share and reflect | 5 min | Present one finding and one open question | Supporting an idea with evidence | Can I show evidence for my claim and explain a limit? |
-    | Optional challenge | 30+ min | Change tree depth or compare different input fields using validation data | Model settings and overfitting | Can I compare training and validation scores without using test answers to choose my settings? |
+    Use this board to track your progress. After each stage, answer the last column for your partner. The times are a guide. The chapter buttons at the top count the answers you have written.
+
+    | Stage | Chapter | Time | Check yourself |
+    |---|---|---|---|
+    | **Session 1** · Read the records | 1 · Meet the passengers | 15 min | Can I name three useful inputs and two fields that reveal the answer? |
+    | Compare groups | 2 · Find patterns | 15 min | Can I explain a chart using both a group size and a percentage? |
+    | Write and test a rule | 3 · Make your rule | 25 min | Can I show one wrong prediction of each kind, and say if my rule beats the baseline? |
+    | **Session 2** · Watch a model learn | 4 · Teach a model | 20 min | Can I explain why one question wins, and why test answers must not choose the rule? |
+    | Grow a tree and use a library | 5 · Grow a tree | 15 min | Can I point to the inputs, the answers, the train call, and the predict call? Can I explain overfitting? |
+    | Judge the model | 6 · Check the model | 10 min | Can I name the set my score describes, and a group the model gets wrong more often? |
+    | Use the model | 7 · Try a prediction | 5 min | Can I explain why the answer changed or stayed the same? |
+    | Quiz and share | 8 · Your learning board | 10 min | Can I show evidence for my claim and explain a limit? |
 
     **What success looks like:** you can explain your choices, make a fair comparison, and learn from a wrong prediction. Getting the highest accuracy is not the goal.
 
+    ### Words we used
+
+    | Word | Meaning |
+    |---|---|
+    | Field | A column in the table, such as `age` |
+    | Feature (input) | A detail we give to the model |
+    | Target (label) | The answer we want to predict: `survived` |
+    | Prediction | A guess made by a rule or a model |
+    | Baseline | The simplest guess, used for comparison |
+    | Accuracy | Correct predictions divided by all predictions |
+    | False positive | Predicted survival, but the person died |
+    | False negative | Predicted non-survival, but the person survived |
+    | Model | A rule learned from examples |
+    | Training set | The examples the model learns from |
+    | Test set | Examples kept aside to check the model |
+    | Decision tree | A model that asks yes/no questions in a row |
+    | Decision stump | A tree with only one question |
+    | Overfitting | Fitting the training examples closely but doing worse on new ones |
+    | Seed | The starting number for a shuffle; the same seed gives the same shuffle |
+    | Inference | Using a trained model to make a new prediction |
+    | Data leakage | Giving the model an input that reveals the answer |
+
     ### Save and share your work
-    Choose **Save notebook** to download your edited notebook. Include it with your chart, result, and explanation when you share your work. Browser edits are saved only in this browser; they do not update the project files in GitHub.
+
+    Choose **Save my work** to download a report with your answers, guesses, code, and results. Open it in any browser to check it, then hand it in. To continue on another computer, choose **Open saved work** there and pick that file.
 
     ### Source
+
     [Titanic3 documentation](https://search.r-project.org/CRAN/refmans/PASWR/html/titanic3.html) · [CSV source](https://hbiostat.org/data/repo/titanic3.csv).
+
     This notebook uses the same data and starting rule as `manual.js`.
+
     Concept references: [Decision trees](https://scikit-learn.org/stable/modules/tree.html) · [Avoiding data leakage](https://scikit-learn.org/stable/common_pitfalls.html#data-leakage). The runnable example here is JavaScript.
   </script>
 </notebook>
