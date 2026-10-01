@@ -1,0 +1,19 @@
+{
+  "name": "WebLab — Titanic JavaScript",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bookworm",
+  "remoteUser": "node",
+  "postCreateCommand": "npm --prefix titanic-js ci",
+  "forwardPorts": [5174],
+  "portsAttributes": {
+    "5174": {
+      "label": "Titanic classroom notebook",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": { "files.eol": "\n" }
+    }
+  }
+}

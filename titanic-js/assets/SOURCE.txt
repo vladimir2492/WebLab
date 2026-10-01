@@ -1,0 +1,33 @@
+Dataset: titanic3, Titanic passenger survival data
+Download: https://hbiostat.org/data/repo/titanic3.csv
+Documentation: https://search.r-project.org/CRAN/refmans/PASWR/html/titanic3.html
+Retrieved: 2026-10-01
+
+Replaces the previous 891-record seaborn subset.
+1309 passenger records, 14 columns; 500 survived and 809 did not survive.
+Downloaded CSV preserved without modification, stored as titanic.csv.
+This is the standard expanded passenger dataset, not a current definitive
+historical manifest. It excludes crew and reflects research available on
+1999-08-02. Some ages are estimates; other values are missing.
+Thomas Cason of the University of Virginia compiled improvements using
+Encyclopedia Titanica, according to the dataset documentation.
+
+Fields:
+pclass: ticket class (1, 2, or 3)
+survived: 0 = did not survive; 1 = survived
+name: passenger name
+sex: recorded sex
+age: age in years (may be estimated or missing)
+sibsp: number of siblings/spouses aboard
+parch: number of parents/children aboard
+ticket: ticket number
+fare: passenger fare
+cabin: cabin designation
+embarked: C = Cherbourg, Q = Queenstown, S = Southampton
+boat: lifeboat
+body: body identification number
+home.dest: home/destination
+
+Empty fields are missing values, not zero.
+For prediction, survived is the target. Exclude boat and body from inputs:
+these record information from after the disaster and can reveal the outcome.

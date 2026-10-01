@@ -1,0 +1,11 @@
+{
+  "name": "weblab",
+  "private": true,
+  "scripts": {
+    "setup": "npm --prefix titanic-js ci",
+    "start": "npm --prefix titanic-js start",
+    "dev": "npm --prefix titanic-js run dev",
+    "build": "npm --prefix titanic-js run build",
+    "manual": "npm --prefix titanic-js run manual"
+  }
+}
