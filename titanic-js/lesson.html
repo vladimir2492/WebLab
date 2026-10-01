@@ -7,11 +7,13 @@
     First look at the data. Then compare groups, make a rule, and check where the rule is wrong.
     We use JavaScript to ask questions about the data. The main goal is to learn how to check an idea with facts.
 
-    **Your task:** build a small learning website about Titanic passengers. Visitors should be able to look at the data, try a prediction, and understand why it can be wrong. A **prediction** is a guess made by a rule or a model.
+    **Your challenge:** use this notebook to explore Titanic passengers, test your own prediction rule, and explain what you discover. A **prediction** is a guess made by a rule or a model. At the end, show a partner one result and one mistake your model made.
     Work in pairs: one person runs the cells. The other guesses what will happen and explains the result. Swap jobs halfway through.
-    **By the end:** explain the fields, compare groups, check a rule against a simple starting guess, and explain how a computer learns a rule from examples.
+    **What you will learn:** read the fields, compare groups fairly, check your rule against a simple starting guess, and explain how a computer learns from examples. You do not need to memorize the JavaScript. Read the explanations, change one thing at a time, and use the results to explain your ideas.
 
-    ## 1. Meet the passengers
+    **How to use your notebook:** results load when you open the page. To try a change, choose **Edit code**, change a value, and press **Run** or **Shift+Enter**. Use **+ Code cell** to add your own experiment. Your edits stay in this browser; choose **Save notebook** to download your work before you finish.
+
+    ## Meet the passengers
     Our table has 1,309 passenger rows and 14 columns. Each row is one passenger. Each column gives one detail about that passenger. Scroll to see more rows. Click a column name to sort the table.
     **Talk before coding:** What can you learn from one row? Which details were known before the ship sank? Which values are missing?
     This is a historical dataset for learning. It does not include the ship's crew. Some ages are estimates, and the list may differ from newer historical research.
@@ -91,7 +93,7 @@
     `pclass` is ticket class; `sibsp` counts siblings/spouses aboard; `parch` counts parents/children aboard.
     **Do not use `boat` or `body` to predict:** they record events after the disaster and can reveal the answer.
 
-    ## 2. Ask a smaller question
+    ## Ask a smaller question
     Instead of reading every row, select first-class passengers. Before revealing the outcome, guess: did every first-class passenger survive?
   </script>
   <script id="4" type="module" pinned>
@@ -99,11 +101,11 @@
     display(Inputs.table(firstClass, {columns: ["name", "pclass", "age", "sex", "survived"]}));
   </script>
   <script id="5" type="text/markdown">
-    ## 3. Group fields to find patterns
+    ## Group fields to find patterns
     Group passengers by one field, count the people, and count survivors.
     **Why a rate?** A larger group can have more survivors simply because it has more people.
     For example, 30 survivors out of 100 people is 30%; 20 out of 40 is 50%. The group with fewer survivors has the higher survival rate.
-    **Student task:** write one sentence with a group size and a survival rate, then one question the data cannot answer.
+    **Your turn:** write one sentence with a group size and a survival rate, then one question the data cannot answer.
     Change the grouping field and compare both counts and percentages. If two things appear together in the data, that does not prove one caused the other. For example, a higher survival rate in one ticket class does not, by itself, explain why those passengers survived.
   </script>
   <script id="6" type="module" pinned>
@@ -125,7 +127,7 @@
     }));
   </script>
   <script id="8" type="text/markdown">
-    ## 4. Turn age into groups
+    ## Turn age into groups
     Age has many different values. We can make it easier to compare people by putting ages into groups. A **cutoff** is the number where we divide the groups.
     With a cutoff of `16`, a 15-year-old is in “Under 16” and a 16-year-old is in “16 or older.” A missing age goes in “Unknown age.”
     Begin at 16 to match our idea. Move the slider: does the pattern stay the same?
@@ -143,9 +145,9 @@
     }));
   </script>
   <script id="11" type="text/markdown">
-    ## 5. Write a manual prediction rule
+    ## Write a manual prediction rule
     Our starting rule: **first class OR younger than 16 → predict survival. Otherwise → predict non-survival.**
-    Use the slider above to explore the age threshold. A missing age does not satisfy the age condition.
+    Use the age slider in **Find patterns** to change the cutoff. This rule uses your chosen cutoff. A missing age does not count as younger than the cutoff.
     Before looking at accuracy, make your own estimate. What kind of mistakes do you expect?
     **Checkpoint:** explain OR in plain language. Would a 40-year-old first-class passenger qualify? Would a 10-year-old third-class passenger qualify? Would a 16-year-old third-class passenger qualify?
   </script>
@@ -158,7 +160,7 @@
     const predictions = passengers.map(p => ({...p, predicted: predictSurvival(p)}));
   </script>
   <script id="13" type="text/markdown">
-    ## 6. Compare predictions with reality
+    ## Compare predictions with reality
     **Accuracy** tells us how often our prediction is right. If a rule gets 8 out of 10 people right, its accuracy is `80%`.
     A **baseline** is a simple guess we use for comparison. Here it is “predict non-survival for everyone.” Our rule should do better than this easy starting guess to be useful.
   </script>
@@ -182,10 +184,10 @@
     }));
   </script>
   <script id="16" type="text/markdown">
-    ## 7. Investigate mistakes
+    ## Investigate mistakes
     Select the type of mistake and read the individual records. Can you explain a mistaken prediction without inventing facts?
     A **false positive** predicts survival for someone who died. A **false negative** predicts non-survival for someone who survived. These are prediction errors, not judgments about the people.
-    **Student task:** find one example of each. Explain why a group pattern cannot determine an individual's outcome.
+    **Your turn:** find one example of each mistake. Explain why a pattern for a whole group cannot tell you what happened to every person in it.
   </script>
   <script id="17" type="module" pinned>
     const mistakeType = view(Inputs.select(["All mistakes", "Predicted survival, but died", "Predicted non-survival, but survived"], {label: "Show"}));
@@ -198,14 +200,14 @@
     display(Inputs.table(mistakes, {columns: ["name", "pclass", "sex", "age", "predicted", "survived"]}));
   </script>
   <script id="19" type="text/markdown">
-    ## 8. Propose the next experiment
+    ## Propose the next experiment
     1. Write a different rule in plain language before changing the code.
     2. Change only `predictSurvival` and watch the comparison update.
     3. Report accuracy, both kinds of mistakes, and what you still do not know.
 
     **Record your hypothesis:** “I expect ___ because ___.” Then record your result: “The rule got ___ correct, but failed when ___.” Keep the evidence even if the hypothesis fails.
 
-    **A limit of this experiment:** we explored and evaluated the same data. Selecting the best rule on these records does not establish performance on unseen people. The next part demonstrates separating training from testing.
+    **What this score cannot tell you:** you used the same records to explore ideas and check your rule. A rule that works well here may do worse on new records. Next, you will separate the examples used for learning from the examples used for checking.
 
     **Web design challenge:** How would you present a prediction to a visitor so they understand its uncertainty? Group survival rates are not guarantees for individual people.
 
@@ -245,7 +247,7 @@
     A bigger **decision tree** repeats this idea: after the first question, it can ask another question inside a group. The library below chooses splits using *Gini impurity*—a way to measure how mixed the `1` and `0` labels are. The animation uses correct-answer counts to introduce the idea simply.
   </script>
   <script id="21" type="text/markdown">
-    ## 9. From a manual rule to machine learning
+    ## From a manual rule to machine learning
     We wrote the first rule ourselves. Now we will give the computer passenger examples and their real answers. The computer will try several rules and choose one that works well on those examples. This is called **supervised learning**: learning from examples that include answers.
 
     Our model is a **decision stump**. This is a small decision tree that asks just one yes/no question. For example: “Is the passenger in first class?” A yes sends the passenger to one group; a no sends them to the other group. Each group predicts whichever answer was more common in its learning examples.
@@ -263,11 +265,11 @@
 
     **Before running:** will a learned rule necessarily beat our manual rule? What evidence would convince you?
 
-    ### Prepare a reproducible split
+    ### Split the data the same way each time
     The helper below mixes up survivors and non-survivors separately. About 80% of each group becomes the **training set**: examples used to learn. The other 20% becomes the **test set**: examples used to check the learned rule.
     Think of 100 example cards: about 80 are for learning and 20 are for checking. Our real dataset is larger. A **seed** is a starting number for the shuffle; using `42` every time gives us the same split.
     In this simple model, unknown ages form a separate candidate group; age comparisons treat unknown age as “condition not met.” No missing age is converted to zero.
-    **Teacher note:** the whole dataset was already visible during exploration. This split demonstrates the method; it is not a pristine, unseen final exam. For a formal assessment, reserve a hidden test set before exploration. People sharing families or tickets can also make random passenger splits less independent.
+    **Keep your test fair:** you have already explored the full table, so this is practice at splitting data, not a completely new final test. In a new project, put test records aside before exploring. Passengers from the same family or ticket may also have similar stories. If they appear in both sets, the test may be easier than a test on completely new groups.
   </script>
   <script id="22" type="module" pinned>
     function splitPassengers(rows, seed = 42) {
@@ -293,9 +295,9 @@
     ]));
   </script>
   <script id="23" type="text/markdown">
-    ## 10. Train: let the examples choose the rule
+    ## Train: let the examples choose the rule
     Run the helper cell, then the training cell. You do not need to memorize this code. Explain its four actions: **try a question → divide rows → predict the majority in each branch → count mistakes**.
-    Candidate questions and the training table are shown so that learning is visible. Equal scores keep the earlier candidate; a tied branch predicts non-survival. This is a teaching implementation, not a full decision-tree library.
+    Read the list of possible questions and the number of mistakes for each. If two questions have the same score, the code keeps the earlier one. If a branch has equal numbers of survivors and non-survivors, it predicts `0`. Follow these choices to explain how this one-question model learns.
   </script>
   <script id="24" type="module" pinned>
     function majority(rows) {
@@ -331,14 +333,14 @@
     }))));
   </script>
   <script id="26" type="text/markdown">
-    ## 11. Test: compare three approaches on the same people
+    ## Test: compare three approaches on the same people
     The baseline learns only the majority outcome in training. The manual rule stays fixed at first class OR age under 16. The stump chooses its question using training rows only.
     Compare all three on exactly the same test passengers. Do not compare test accuracy here directly with the earlier full-dataset accuracy: the passenger sets differ.
     **Accuracy:** out of all passengers, how many did we get right? Example: 80 correct out of 100 = `80%`.
     **Survivor recall:** out of the people who really survived, how many did we find? Example: we found 6 of 10 real survivors = `60%`.
     **Survivor precision:** out of the people we said would survive, how many really did? Example: 6 of our 8 survival predictions were right = `75%`.
     These are made-up examples to explain the scores. The table below shows our real results. A blank score means there were no people in the group we would divide by—for example, precision is blank when the rule predicts no survivors.
-    **Student task:** name the best score, explain one mistake it hides, and state why you should not keep redesigning the model after looking at test results. Use a separate validation set for repeated design decisions.
+    **Your turn:** name the rule with the highest test accuracy, then describe one mistake it still makes. Why would it be unfair to keep changing the rule until it fits the test answers? If you want to try many designs, use a third group of records called a **validation set** to compare them. Save the test set for your final check.
   </script>
   <script id="27" type="module" pinned>
     function evaluateRule(name, rows, predict) {
@@ -393,13 +395,13 @@
     ### A high score needs a label
     **Training score** asks “How well did the model learn the examples it studied?” **Test score** asks “How well does it work on examples the training code did not use?”
     The deep tree can fit small details in the training data. Some details do not help on other passengers. This is **overfitting**. A 90% training score does not promise 90% accuracy on new people.
-    These are two planned classroom experiments, not a search for whichever test score looks best. Use validation data to choose model settings in a real project, then check a fresh test set once. Our class has already explored the full historical dataset, so these results remain a teaching demonstration.
+    Compare the two designs as they are. Use the results to explain what changes when a tree gets deeper. In your own project, choose settings with validation data, then check a fresh test set once. Remember that you already explored this full table, so use this experiment to practise the method rather than claim a final score on completely unseen data.
     **Say it clearly:** “Our model got ___% on ___ passengers in the ___ set.” Never report an accuracy number without saying which set it describes.
   </script>
   <script id="44" type="text/markdown">
     ## Now use a real ML library on Titanic
-    We installed **ml-cart**, a JavaScript library that builds decision trees. The full working example is below: load the data → split it → fill missing inputs → train → predict → check results.
-    This cell runs on its own. It reads the CSV again and makes the same fixed 80/20 split; it does not rely on the earlier helper cells. The only local bridge imports the installed library.
+    Now train a tree with **ml-cart**, a JavaScript library included in your project. Follow the full example below: load the data → split it → fill missing inputs → train → predict → check results.
+    You can run this cell on its own. It reads the CSV again and makes the same 80/20 split. Follow the numbered comments to find each step; you do not need to memorize every line.
 
     | Code name | Simple meaning |
     |---|---|
@@ -472,7 +474,7 @@
           actual: p.survived, predicted: predictedTest[i], correct: p.survived === predictedTest[i]}))};
     })();
 
-    // 6. Show the measured results, not a promised accuracy number.
+    // 6. Show your scores, chart, and individual test predictions.
     display(Inputs.table(libraryRun.scores));
     display(Plot.barX(libraryRun.scores, {y: "set", x: "accuracy (%)", fill: "set", tip: true})
       .plot({x: {domain: [0, 100], grid: true}, height: 170, marginLeft: 75}));
@@ -485,7 +487,7 @@
     **Say what happened:** “We trained on ___ passengers. On the test set, ___ out of ___ predictions were correct.” The next chapter lets you use this library model with your own inputs.
   </script>
   <script id="28" type="text/markdown">
-    ## 12. Use the model in a web interface
+    ## Use the model in a web interface
     Training chooses the rule. **Inference** means using the rule to make a new prediction. It does not mean training again.
     Our form compares the **ml-cart library model** with our **hand-written small tree**. Enter class, age, sex, fare, and family counts. Each model returns `1` or `0`. Neither gets to see a real survival answer.
     Change the inputs and read the path. A small change may leave the prediction unchanged because the passenger still follows the same branches. The displayed result is a class prediction, not a personal survival probability.
@@ -505,33 +507,36 @@
     display(`Library prediction: ${libraryVisitorPrediction === 1 ? "survival" : "non-survival"}.`);
     display(`Hand-written tree prediction: ${visitorPrediction === 1 ? "survival" : "non-survival"}.`);
     display(`Hand-written tree path: ${smallTree.explain(visitor)}`);
-    display("This is a historical-data classroom model, not a statement about what would happen to a real individual.");
+    display("Read this as the model's guess from historical patterns. It cannot tell you what would happen to a real person.");
   </script>
   <script id="31" type="text/markdown">
-    ### Reflect before presenting
-    The model summarizes historical associations; it does not establish causes or anyone's value. A learned rule can reproduce historical inequality. A strong overall score can also hide differences between groups.
-    **Team deliverable:** a short demonstration with one chart, your written hypothesis, the learned rule, test metrics, one mistaken prediction, and a visitor-facing explanation of a limitation.
-    **Exit questions:** What did the model learn? Which data did it learn from? Why exclude lifeboats? Why is training accuracy insufficient? Which extra evidence would you want before trusting it beyond this lesson?
+    ### Get ready to share your discoveries
+    Your model finds patterns in historical records. It does not prove why someone survived. It can repeat unfair patterns from the past, and a good overall score can hide more mistakes for some groups than others.
+    **Show your work:** prepare a short demonstration with your partner. Include one chart, your starting idea, the rule the model learned, its test score, and one wrong prediction. Explain one reason a visitor should not treat its answer as certain.
+    **Before you finish, answer:** What did the model learn? Which records did it learn from? Why did you leave out lifeboats? Why is a training score not enough? What else would you want to check before using the model outside this lesson?
 
-    ## Learning-plan board · two sessions, 60 minutes each
-    Use this board to lead the class. Finish a stage when students can show the evidence in the final column. The optional extension is outside the two-session schedule.
+    ## Your learning board · two sessions, 60 minutes each
+    Use this board to track your progress. After each stage, explain the last column to your partner or write a short answer in your notes. The times are a guide. Try the optional challenge after you finish the main activities.
 
-    | Stage | Time | Student activity | Knowledge goal | Evidence of learning |
+    | Your stage | Suggested time | What to try | What you are learning | Check yourself |
     |---|---|---|---|---|
-    | Session 1 · Read the records | 10 min | Explain fields and inspect the whole table | Rows, fields, types, features, target, missing data | Correctly classify three inputs and two excluded outcome fields |
-    | Ask and filter | 10 min | Predict which group might survive more; filter first class | Testable hypotheses and subsets | A prediction written before checking results |
-    | Group and visualize | 15 min | Group by class/sex/port; compare age bands | Counts, rates, association versus causation | One chart explained with group size and percentage |
-    | Write a manual rule | 10 min | Explain OR; try the starting rule | Explicit decision rules and boundary cases | Correctly predict three example profiles |
-    | Measure and inspect mistakes | 15 min | Compare with baseline; find both error types | Accuracy, false positives, false negatives | A result plus two counterexamples |
-    | Session 2 · Explain learning | 10 min | Play the 10-passenger animation; count each branch's votes | Supervised learning, labels, one-question trees | Explain why one candidate question wins |
-    | Separate the data | 10 min | Run the repeatable split and inspect its sizes | Test sets, leakage, independent evaluation | Explain why test labels cannot choose the rule |
-    | Train a small model | 15 min | Follow the full ml-cart example from inputs to predictions | Training code, feature rows, library models | Point to the inputs, labels, train call, and predict call |
-    | Evaluate fairly | 10 min | Compare three methods on the same test rows | Precision, recall, generalization | A comparison that names the evaluation set and a limitation |
-    | Build understanding in the web UI | 10 min | Change visitor inputs; explain each prediction | Inference, input handling, user communication | A working form and a clear explanation |
-    | Present and reflect | 5 min | Share a finding and answer an exit question | Evidence-based claims and model limits | One supported claim and one unanswered question |
-    | Optional extension | 30+ min | Design a deeper tree or add fare/family features; use validation data | Model complexity, overfitting, feature engineering | Compare training and validation errors before opening a fresh test set |
+    | Session 1 · Read the records | 10 min | Read a row and explain its values | Rows, fields, inputs, answers, missing values | Can I name three useful inputs and two fields that reveal the answer? |
+    | Ask and filter | 10 min | Write a guess, then look at first class | Asking a question you can check with data | Did I write my guess before checking the result? |
+    | Group and visualize | 15 min | Group by class, sex, or port; compare ages | Counts, percentages, patterns and causes | Can I explain a chart using both a group size and a percentage? |
+    | Write your rule | 10 min | Try first class OR younger than the cutoff | Clear rules and what happens at the cutoff | Can I apply the rule to three example passengers? |
+    | Find mistakes | 15 min | Compare your rule with the baseline | Accuracy and the two kinds of error | Can I show one wrong prediction of each kind? |
+    | Session 2 · Watch a model learn | 10 min | Play the animation and count the votes | Learning a question from examples with answers | Can I explain why one question wins on these 10 examples? |
+    | Separate the data | 10 min | Run the split and check both group sizes | Learning examples and test examples | Can I explain why test answers must not choose the rule? |
+    | Train with a library | 15 min | Follow the full ml-cart example | Inputs, labels, training, and prediction | Can I point to the inputs, answers, train call, and predict call? |
+    | Compare fairly | 10 min | Compare rules on the same test records | Accuracy, precision, recall, and new examples | Can I name the set my score describes and a mistake it hides? |
+    | Try the web form | 10 min | Change one passenger detail at a time | Using a trained model to make a prediction | Can I explain why the answer changed or stayed the same? |
+    | Share and reflect | 5 min | Present one finding and one open question | Supporting an idea with evidence | Can I show evidence for my claim and explain a limit? |
+    | Optional challenge | 30+ min | Change tree depth or compare different input fields using validation data | Model settings and overfitting | Can I compare training and validation scores without using test answers to choose my settings? |
 
-    **Assessment:** reward explanations, fair comparisons, and honest treatment of mistakes. A higher accuracy score alone is not the learning goal.
+    **What success looks like:** you can explain your choices, make a fair comparison, and learn from a wrong prediction. Getting the highest accuracy is not the goal.
+
+    ### Save and share your work
+    Choose **Save notebook** to download your edited notebook. Include it with your chart, result, and explanation when you share your work. Browser edits are saved only in this browser; they do not update the project files in GitHub.
 
     ### Source
     [Titanic3 documentation](https://search.r-project.org/CRAN/refmans/PASWR/html/titanic3.html) · [CSV source](https://hbiostat.org/data/repo/titanic3.csv).

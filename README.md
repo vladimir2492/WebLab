@@ -10,7 +10,7 @@ Explore 1,309 passenger records, write simple prediction rules, watch a decision
 
 ### Start in Codespaces
 
-1. Click **Open in GitHub Codespaces** above and create your codespace. Each student can create their own copy of the working environment.
+1. Click **Open in GitHub Codespaces** above to create your own working environment.
 2. Wait for setup to finish. Node.js and the lesson dependencies are installed automatically.
 3. In the terminal at the repository root, run:
 
@@ -23,7 +23,7 @@ Explore 1,309 passenger records, write simple prediction rules, watch a decision
 
 Keep the terminal running during the lesson. Stop the codespace when you finish using it.
 
-### Save student work
+### Save your work
 
 Edits in the classroom page are saved in that browser. They do **not** change the files in the repository. Use **Save notebook** to download your edited notebook and submit that file to your teacher. To keep source changes in GitHub, edit files in Codespaces and commit them to your own branch or fork.
 

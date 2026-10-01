@@ -9,7 +9,7 @@ Learn how to ask questions about data, test a rule, and measure what a model lea
 3. **Make your rule:** predict survival using ticket class and age, then count mistakes.
 4. **Teach a model:** animate two possible questions using 10 made-up passengers; then train on real Titanic records with full editable `ml-cart` code.
 5. **Try a prediction:** enter passenger details and compare model answers.
-6. **Your learning board:** discussion questions, activities, and a two-session teaching plan.
+6. **Your learning board:** track your progress, check your understanding, and prepare to share your discoveries.
 
 The 10-row animation demonstrates a **decision stump**: a tree with one question. It compares majority-vote predictions and highlights mistakes. The library builds a larger decision tree using Gini impurity.
 
@@ -55,4 +55,4 @@ This historical dataset excludes crew and is not a definitive modern manifest. T
 
 ## Classroom work
 
-Browser edits stay in local browser storage. **Save notebook** downloads an edited HTML notebook for submission. Downloading does not update `lesson.html` in the repository. Teacher changes to the shared lesson belong in that source file; student experiments can be submitted as downloaded notebooks.
+Your browser edits stay in that browser. Choose **Save notebook** to download your edited HTML notebook and share your experiments. Include a chart, a result, and an explanation of one mistake. Downloading does not update `lesson.html` in the repository. If you want to change the project source, edit the files in your own branch or fork and commit your changes.
